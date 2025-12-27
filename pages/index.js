@@ -10,42 +10,58 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    const userData = localStorage.getItem('user')
+    const userData = typeof window !== 'undefined' ? localStorage.getItem('user') : null
     if (userData) setUser(JSON.parse(userData))
 
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const categories = [
-    { name: 'iPhone', slug: 'smartphones', icon: '📱', color: '#000' },
-    { name: 'Mac', slug: 'laptops', icon: '💻', color: '#000' },
-    { name: 'iPad', slug: 'tablets', icon: '📲', color: '#000' },
-    { name: 'Watch', slug: 'watches', icon: '⌚', color: '#000' },
-    { name: 'AirPods', slug: 'audio', icon: '🎧', color: '#000' },
-    { name: 'Accessories', slug: 'accessories', icon: '✨', color: '#000' },
+  const offers = [
+    {
+      title: 'Offre iPhone du moment',
+      subtitle: 'Économisez jusqu’à 30% sur une sélection de smartphones.',
+      tag: 'Smartphones',
+      cta: 'Voir les offres iPhone',
+      href: '/store?category=smartphones',
+    },
+    {
+      title: 'Mac & PC pour les pros',
+      subtitle: 'Performances haut de gamme pour travailler et jouer.',
+      tag: 'Ordinateurs',
+      cta: 'Voir les offres Mac & PC',
+      href: '/store?category=computers',
+    },
+    {
+      title: 'Reconditionné Premium',
+      subtitle: 'Garantie, contrôlé, prêt à l’emploi. Meilleur prix, même qualité.',
+      tag: 'Reconditionné',
+      cta: 'Voir le reconditionné',
+      href: '/store?condition=refurbished',
+    },
   ]
 
   return (
     <>
       <Head>
-        <title>Empire Électronique — Premium Tech Store</title>
-        <meta name="description" content="The future of shopping. Powered by AI." />
+        <title>Empire Électronique — Offres du moment</title>
+        <meta
+          name="description"
+          content="Offres électroniques premium, neuf et reconditionné. Service IA intégré."
+        />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+
         * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
         }
-        
+
         html {
           scroll-behavior: smooth;
         }
@@ -59,20 +75,25 @@ export default function Home() {
           overflow-x: hidden;
         }
 
-        /* HEADER STYLE APPLE */
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+
+        /* HEADER MINIMAL STYLE APPLE */
         .header {
           position: fixed;
           top: 0;
           left: 0;
           right: 0;
           z-index: 1000;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: all 0.3s ease;
         }
 
         .header.scrolled {
-          background: rgba(0, 0, 0, 0.8);
+          background: rgba(0, 0, 0, 0.85);
           backdrop-filter: saturate(180%) blur(20px);
-          border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+          border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
         }
 
         .nav-container {
@@ -86,31 +107,20 @@ export default function Home() {
         }
 
         .logo {
-          font-size: 1.3rem;
+          font-size: 1.2rem;
           font-weight: 600;
-          color: #f5f5f7;
-          letter-spacing: -0.5px;
+          letter-spacing: -0.4px;
         }
 
         .nav-links {
           display: flex;
-          gap: 2.5rem;
+          gap: 2rem;
           align-items: center;
-        }
-
-        @media (max-width: 768px) {
-          .nav-links {
-            display: none;
-          }
+          font-size: 0.85rem;
         }
 
         .nav-links a {
-          color: #f5f5f7;
-          font-size: 0.85rem;
-          font-weight: 400;
-          text-decoration: none;
           opacity: 0.8;
-          transition: opacity 0.2s;
         }
 
         .nav-links a:hover {
@@ -127,6 +137,9 @@ export default function Home() {
         }
 
         @media (max-width: 768px) {
+          .nav-links {
+            display: none;
+          }
           .burger {
             display: block;
           }
@@ -139,22 +152,19 @@ export default function Home() {
           right: 0;
           background: rgba(0, 0, 0, 0.95);
           backdrop-filter: blur(20px);
-          padding: 2rem;
+          padding: 1.5rem 2rem;
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
-          border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+          gap: 1rem;
+          border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
         }
 
         .mobile-menu a {
-          color: #f5f5f7;
-          font-size: 1.1rem;
-          font-weight: 400;
-          text-decoration: none;
-          opacity: 0.8;
+          font-size: 1rem;
+          opacity: 0.85;
         }
 
-        /* HERO SECTION STYLE APPLE */
+        /* HERO = OFFRES DU MOMENT */
         .hero {
           min-height: 100vh;
           display: flex;
@@ -163,487 +173,321 @@ export default function Home() {
           align-items: center;
           text-align: center;
           padding: 80px 20px 60px;
-          background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
-          position: relative;
-          overflow: hidden;
+          background: radial-gradient(circle at top, #1a1a1a 0, #000 55%);
         }
 
-        .hero::before {
-          content: '';
-          position: absolute;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(0, 113, 227, 0.15) 0%, transparent 70%);
-          top: -250px;
-          right: -250px;
-          pointer-events: none;
-        }
-
-        .hero-badge {
-          display: inline-block;
-          padding: 8px 16px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          font-size: 0.75rem;
-          font-weight: 500;
-          letter-spacing: 0.5px;
-          margin-bottom: 1.5rem;
-          backdrop-filter: blur(10px);
+        .hero-label {
+          font-size: 0.8rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          opacity: 0.7;
+          margin-bottom: 1rem;
         }
 
         .hero-title {
-          font-size: 4.5rem;
+          font-size: 3.5rem;
           font-weight: 700;
-          letter-spacing: -2px;
-          line-height: 1.1;
-          margin-bottom: 1rem;
-          background: linear-gradient(135deg, #fff 0%, #a0a0a0 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          letter-spacing: -0.08em;
+          margin-bottom: 0.75rem;
         }
 
         @media (max-width: 768px) {
           .hero-title {
-            font-size: 2.8rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .hero-title {
-            font-size: 2rem;
+            font-size: 2.4rem;
           }
         }
 
         .hero-subtitle {
-          font-size: 1.5rem;
-          font-weight: 400;
-          opacity: 0.8;
-          margin-bottom: 3rem;
-          max-width: 700px;
+          font-size: 1.2rem;
+          opacity: 0.75;
+          max-width: 600px;
+          margin-bottom: 2.5rem;
         }
 
         @media (max-width: 768px) {
-          .hero-subtitle {
-            font-size: 1.2rem;
-          }
-        }
-
-        @media (max-width: 480px) {
           .hero-subtitle {
             font-size: 1rem;
           }
         }
 
-        .cta-buttons {
+        .hero-buttons {
           display: flex;
-          gap: 1rem;
           flex-wrap: wrap;
+          gap: 1rem;
           justify-content: center;
         }
 
-        .btn-primary {
-          background: #0071e3;
-          color: white;
-          padding: 14px 30px;
-          border: none;
-          border-radius: 980px;
-          font-size: 1rem;
+        .btn-primary,
+        .btn-secondary {
+          padding: 14px 32px;
+          border-radius: 999px;
+          font-size: 0.95rem;
           font-weight: 500;
+          border: none;
           cursor: pointer;
           transition: all 0.2s;
         }
 
+        .btn-primary {
+          background: #f5f5f7;
+          color: #000;
+        }
+
         .btn-primary:hover {
-          background: #0077ed;
-          transform: scale(1.02);
+          background: #ffffff;
         }
 
         .btn-secondary {
           background: transparent;
-          color: #0071e3;
-          padding: 14px 30px;
-          border: 1.5px solid #0071e3;
-          border-radius: 980px;
-          font-size: 1rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s;
+          color: #f5f5f7;
+          border: 1px solid rgba(245, 245, 247, 0.4);
         }
 
         .btn-secondary:hover {
-          background: rgba(0, 113, 227, 0.1);
+          background: rgba(245, 245, 247, 0.08);
         }
 
         @media (max-width: 480px) {
-          .btn-primary, .btn-secondary {
+          .btn-primary,
+          .btn-secondary {
             width: 100%;
-            padding: 12px 24px;
           }
         }
 
-        /* CATEGORIES SECTION */
-        .categories-section {
-          padding: 100px 20px;
+        /* OFFERS SECTION */
+        .offers-section {
+          padding: 60px 20px 80px;
           background: #000;
         }
 
-        .section-header {
-          text-align: center;
-          margin-bottom: 4rem;
-        }
-
-        .section-title {
-          font-size: 3rem;
-          font-weight: 700;
-          letter-spacing: -1px;
-          margin-bottom: 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-          .section-title {
-            font-size: 2rem;
-          }
-        }
-
-        .section-subtitle {
-          font-size: 1.1rem;
-          opacity: 0.6;
-          font-weight: 400;
-        }
-
-        .categories-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 20px;
+        .offers-container {
           max-width: 1200px;
           margin: 0 auto;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 24px;
         }
 
-        @media (max-width: 480px) {
-          .categories-grid {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        .category-card {
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 18px;
-          padding: 3rem 2rem;
-          text-align: center;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          backdrop-filter: blur(10px);
-        }
-
-        .category-card:hover {
-          background: rgba(255, 255, 255, 0.05);
-          border-color: rgba(255, 255, 255, 0.15);
-          transform: translateY(-5px);
-        }
-
-        .category-icon {
-          font-size: 3.5rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .category-name {
-          font-size: 1.5rem;
-          font-weight: 600;
-          margin-bottom: 1rem;
-          letter-spacing: -0.5px;
-        }
-
-        .category-types {
+        .offer-card {
+          background: linear-gradient(135deg, #111 0, #050505 100%);
+          border-radius: 24px;
+          padding: 28px 24px;
+          border: 1px solid rgba(255, 255, 255, 0.06);
           display: flex;
-          gap: 0.75rem;
-          justify-content: center;
-          flex-wrap: wrap;
+          flex-direction: column;
+          gap: 10px;
+          justify-content: space-between;
         }
 
-        .type-badge {
-          background: rgba(255, 255, 255, 0.1);
-          padding: 6px 14px;
-          border-radius: 12px;
-          font-size: 0.8rem;
-          font-weight: 500;
-          transition: all 0.2s;
+        .offer-tag {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.18em;
+          opacity: 0.7;
         }
 
-        .type-badge:hover {
-          background: rgba(255, 255, 255, 0.15);
+        .offer-title {
+          font-size: 1.4rem;
+          font-weight: 600;
+          letter-spacing: -0.04em;
         }
 
-        /* AI SECTION */
-        .ai-section {
-          padding: 100px 20px;
-          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-          text-align: center;
-        }
-
-        .ai-container {
-          max-width: 800px;
-          margin: 0 auto;
-        }
-
-        .ai-icon {
-          font-size: 4rem;
-          margin-bottom: 2rem;
-        }
-
-        .ai-title {
-          font-size: 3rem;
-          font-weight: 700;
-          letter-spacing: -1px;
+        .offer-subtitle {
+          font-size: 0.95rem;
+          opacity: 0.75;
           margin-bottom: 1rem;
         }
 
-        @media (max-width: 768px) {
-          .ai-title {
-            font-size: 2rem;
-          }
+        .offer-cta {
+          align-self: flex-start;
+          padding: 10px 20px;
+          border-radius: 999px;
+          border: 1px solid rgba(245, 245, 247, 0.4);
+          font-size: 0.9rem;
+          cursor: pointer;
+          background: transparent;
+          color: #f5f5f7;
+          transition: background 0.2s;
         }
 
-        .ai-description {
-          font-size: 1.2rem;
-          opacity: 0.7;
-          margin-bottom: 2rem;
+        .offer-cta:hover {
+          background: rgba(245, 245, 247, 0.1);
         }
 
-        /* NEWSLETTER */
+        /* NEWSLETTER MINIMAL */
         .newsletter-section {
-          padding: 80px 20px;
-          background: rgba(255, 255, 255, 0.02);
+          padding: 60px 20px 80px;
+          background: #050505;
           text-align: center;
         }
 
         .newsletter-title {
-          font-size: 2rem;
+          font-size: 1.6rem;
           font-weight: 600;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .newsletter-text {
+          font-size: 0.95rem;
+          opacity: 0.7;
+          margin-bottom: 1.5rem;
         }
 
         .newsletter-form {
+          max-width: 420px;
+          margin: 0 auto;
           display: flex;
-          gap: 0.5rem;
-          justify-content: center;
-          max-width: 500px;
-          margin: 2rem auto 0;
           flex-wrap: wrap;
+          gap: 0.75rem;
+          justify-content: center;
         }
 
         .newsletter-input {
           flex: 1;
-          min-width: 250px;
-          padding: 14px 20px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
-          color: white;
-          font-size: 1rem;
-          outline: none;
-          transition: all 0.2s;
+          min-width: 220px;
+          padding: 12px 16px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: transparent;
+          color: #f5f5f7;
+          font-size: 0.95rem;
         }
 
         .newsletter-input:focus {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.2);
+          outline: none;
+          border-color: #f5f5f7;
         }
 
-        @media (max-width: 480px) {
-          .newsletter-input {
-            width: 100%;
-          }
+        .newsletter-btn {
+          padding: 12px 20px;
+          border-radius: 999px;
+          border: none;
+          background: #f5f5f7;
+          color: #000;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 500;
         }
 
         /* FOOTER */
         .footer {
-          padding: 2rem 20px;
-          background: #000;
-          border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+          padding: 20px;
           text-align: center;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           opacity: 0.5;
+          border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+          background: #000;
         }
 
-        /* CHAT AI STYLE APPLE */
+        /* FLOATING CHAT */
+        .floating-chat {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          border: none;
+          background: #f5f5f7;
+          color: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+          cursor: pointer;
+          z-index: 900;
+        }
+
+        @media (max-width: 480px) {
+          .floating-chat {
+            bottom: 16px;
+            right: 16px;
+          }
+        }
+
+        /* CHAT POPUP (simple, propre) */
         .chat-overlay {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.85);
-          backdrop-filter: blur(20px);
+          inset: 0;
+          background: rgba(0, 0, 0, 0.75);
           display: flex;
           justify-content: center;
           align-items: center;
-          z-index: 2000;
+          z-index: 1000;
           padding: 1rem;
         }
 
-        .chat-container {
-          background: rgba(20, 20, 20, 0.95);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          width: 90%;
-          max-width: 500px;
+        .chat-box {
+          width: 100%;
+          max-width: 420px;
           max-height: 80vh;
+          background: #050505;
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          backdrop-filter: blur(40px);
         }
 
         .chat-header {
-          padding: 1.5rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          padding: 12px 16px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-        }
-
-        .chat-header h3 {
-          font-size: 1.2rem;
-          font-weight: 600;
-          letter-spacing: -0.5px;
-        }
-
-        .close-btn {
-          background: rgba(255, 255, 255, 0.1);
-          border: none;
-          color: white;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          cursor: pointer;
-          font-size: 1.2rem;
-          transition: all 0.2s;
-        }
-
-        .close-btn:hover {
-          background: rgba(255, 255, 255, 0.15);
-        }
-
-        .chat-mode-badge {
-          padding: 0.5rem 1rem;
-          background: rgba(0, 113, 227, 0.15);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          text-align: center;
-          font-size: 0.75rem;
-          font-weight: 500;
-          letter-spacing: 0.5px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          font-size: 0.9rem;
         }
 
         .chat-messages {
           flex: 1;
+          padding: 12px 16px;
           overflow-y: auto;
-          padding: 1.5rem;
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 8px;
+          font-size: 0.9rem;
         }
 
-        .chat-messages::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 3px;
-        }
-
-        .user-msg, .ai-msg {
-          padding: 12px 16px;
-          border-radius: 18px;
-          max-width: 75%;
-          word-wrap: break-word;
-          font-size: 0.95rem;
-          line-height: 1.5;
-        }
-
-        .user-msg {
-          align-self: flex-end;
-          background: #0071e3;
-          color: white;
-        }
-
-        .ai-msg {
-          align-self: flex-start;
-          background: rgba(255, 255, 255, 0.08);
-          color: #f5f5f7;
-        }
-
-        .chat-input-container {
-          padding: 1rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        .chat-input-row {
+          padding: 10px 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
           display: flex;
-          gap: 0.5rem;
+          gap: 8px;
         }
 
         .chat-input {
           flex: 1;
-          padding: 12px 16px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          color: white;
-          font-size: 0.95rem;
-          outline: none;
-          transition: all 0.2s;
-        }
-
-        .chat-input:focus {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.2);
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: transparent;
+          padding: 8px 12px;
+          color: #f5f5f7;
+          font-size: 0.85rem;
         }
 
         .chat-send {
-          background: #0071e3;
+          border-radius: 999px;
           border: none;
-          color: white;
-          padding: 12px 20px;
-          border-radius: 20px;
+          padding: 8px 14px;
+          background: #f5f5f7;
+          color: #000;
+          font-size: 0.85rem;
           cursor: pointer;
-          font-weight: 500;
-          transition: all 0.2s;
         }
 
-        .chat-send:hover {
-          background: #0077ed;
+        .msg-ai {
+          align-self: flex-start;
+          background: #111;
+          border-radius: 14px;
+          padding: 8px 10px;
         }
 
-        /* FLOATING CHAT BUTTON */
-        .floating-chat {
-          position: fixed;
-          bottom: 30px;
-          right: 30px;
-          width: 60px;
-          height: 60px;
-          background: #0071e3;
-          border: none;
-          border-radius: 50%;
-          color: white;
-          font-size: 1.5rem;
-          cursor: pointer;
-          box-shadow: 0 8px 24px rgba(0, 113, 227, 0.4);
-          transition: all 0.3s;
-          z-index: 999;
-        }
-
-        .floating-chat:hover {
-          transform: scale(1.1);
-          box-shadow: 0 12px 32px rgba(0, 113, 227, 0.5);
-        }
-
-        @media (max-width: 768px) {
-          .floating-chat {
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-          }
+        .msg-user {
+          align-self: flex-end;
+          background: #f5f5f7;
+          color: #000;
+          border-radius: 14px;
+          padding: 8px 10px;
         }
       `}</style>
 
@@ -651,121 +495,109 @@ export default function Home() {
         {/* HEADER */}
         <header className={`header ${scrolled ? 'scrolled' : ''}`}>
           <div className="nav-container">
-            <h1 className="logo">Empire</h1>
-            
+            <div className="logo">Empire</div>
+
             <button className="burger" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? '✕' : '☰'}
             </button>
 
             <nav className="nav-links">
-              <a href="#products">Store</a>
-              <a href="#ai">AI</a>
+              <a onClick={() => router.push('/store')}>Store</a>
+              <a onClick={() => router.push('/store?search=1')}>Recherche</a>
+              <a onClick={() => setShowChat(true)}>IA</a>
               <a href="#support">Support</a>
               {user ? (
-                <a href="/admin/dashboard">
-                  {user.role === 'admin' ? 'Dashboard' : 'Account'}
+                <a onClick={() => router.push('/admin/dashboard')}>
+                  {user.role === 'admin' ? 'Direction' : 'Compte'}
                 </a>
               ) : (
-                <>
-                  <a href="/auth/login">Sign in</a>
-                </>
+                <a onClick={() => router.push('/auth/login')}>Connexion</a>
               )}
-              <a href="#">🛒</a>
+              <a>🛒</a>
             </nav>
           </div>
 
           {menuOpen && (
             <nav className="mobile-menu">
-              <a href="#products" onClick={() => setMenuOpen(false)}>Store</a>
-              <a href="#ai" onClick={() => setMenuOpen(false)}>AI</a>
+              <a onClick={() => { router.push('/store'); setMenuOpen(false) }}>Store</a>
+              <a onClick={() => { router.push('/store?search=1'); setMenuOpen(false) }}>Recherche</a>
+              <a onClick={() => { setShowChat(true); setMenuOpen(false) }}>IA</a>
               <a href="#support" onClick={() => setMenuOpen(false)}>Support</a>
               {user ? (
-                <a href="/admin/dashboard">
-                  {user.role === 'admin' ? 'Dashboard' : 'Account'}
+                <a onClick={() => { router.push('/admin/dashboard'); setMenuOpen(false) }}>
+                  {user.role === 'admin' ? 'Direction' : 'Compte'}
                 </a>
               ) : (
-                <>
-                  <a href="/auth/login">Sign in</a>
-                  <a href="/auth/register">Create account</a>
-                </>
+                <a onClick={() => { router.push('/auth/login'); setMenuOpen(false) }}>
+                  Connexion
+                </a>
               )}
             </nav>
           )}
         </header>
 
-        {/* HERO */}
+        {/* HERO : OFFRES DU MOMENT */}
         <section className="hero">
-          <span className="hero-badge">AI-POWERED SHOPPING</span>
-          <h2 className="hero-title">The future<br />of tech retail.</h2>
+          <div className="hero-label">OFFRES DU MOMENT</div>
+          <h1 className="hero-title">Tech premium,<br />prix intelligents.</h1>
           <p className="hero-subtitle">
-            Experience intelligent shopping with AI-driven recommendations, 
-            automated support, and seamless delivery.
+            Sélection spéciale de smartphones, PC et produits reconditionnés,  
+            optimisée par ton IA pour marges et prix attractifs.
           </p>
-          <div className="cta-buttons">
-            <button className="btn-primary" onClick={() => router.push('/products')}>
-              Shop now
+          <div className="hero-buttons">
+            <button
+              className="btn-primary"
+              onClick={() => router.push('/store?sort=best-deals')}
+            >
+              Voir toutes les offres
             </button>
             <button className="btn-secondary" onClick={() => setShowChat(true)}>
-              Talk to AI
+              Discuter avec l’IA
             </button>
           </div>
         </section>
 
-        {/* CATEGORIES */}
-        <section className="categories-section" id="products">
-          <div className="section-header">
-            <h2 className="section-title">Browse by category</h2>
-            <p className="section-subtitle">New, refurbished, and everything in between.</p>
-          </div>
-          <div className="categories-grid">
-            {categories.map((cat) => (
-              <div key={cat.slug} className="category-card" onClick={() => router.push(`/products/${cat.slug}`)}>
-                <div className="category-icon">{cat.icon}</div>
-                <h3 className="category-name">{cat.name}</h3>
-                <div className="category-types">
-                  <span className="type-badge">New</span>
-                  <span className="type-badge">Refurbished</span>
+        {/* BLOCS D’OFFRES */}
+        <section className="offers-section">
+          <div className="offers-container">
+            {offers.map((offer) => (
+              <article key={offer.title} className="offer-card">
+                <div>
+                  <div className="offer-tag">{offer.tag}</div>
+                  <h2 className="offer-title">{offer.title}</h2>
+                  <p className="offer-subtitle">{offer.subtitle}</p>
                 </div>
-              </div>
+                <button
+                  className="offer-cta"
+                  onClick={() => router.push(offer.href)}
+                >
+                  {offer.cta}
+                </button>
+              </article>
             ))}
           </div>
         </section>
 
-        {/* AI SECTION */}
-        <section className="ai-section" id="ai">
-          <div className="ai-container">
-            <div className="ai-icon">🤖</div>
-            <h2 className="ai-title">Powered by intelligent AI</h2>
-            <p className="ai-description">
-              Our AI finds the best suppliers, optimizes delivery routes, 
-              and provides 24/7 support. All automatically.
-            </p>
-            <button className="btn-primary" onClick={() => setShowChat(true)}>
-              Experience AI assistant
-            </button>
-          </div>
-        </section>
-
         {/* NEWSLETTER */}
-        <section className="newsletter-section">
-          <h2 className="newsletter-title">Stay in the know</h2>
-          <p style={{opacity: 0.6, marginBottom: '1rem'}}>
-            Get updates on new products and exclusive offers.
+        <section className="newsletter-section" id="support">
+          <h2 className="newsletter-title">Reste informé</h2>
+          <p className="newsletter-text">
+            Reçois les nouvelles offres, restocks et promos exclusives.
           </p>
           <NewsletterForm />
         </section>
 
         {/* FOOTER */}
         <footer className="footer">
-          <p>© 2025 Empire Électronique. All rights reserved.</p>
+          © 2025 Empire Électronique Mondial. Tous droits réservés.
         </footer>
 
-        {/* FLOATING CHAT BUTTON */}
+        {/* BOUTON CHAT FLOTTANT */}
         <button className="floating-chat" onClick={() => setShowChat(true)}>
           💬
         </button>
 
-        {/* CHAT AI */}
+        {/* POPUP CHAT IA */}
         {showChat && <ChatAI onClose={() => setShowChat(false)} user={user} />}
       </main>
     </>
@@ -782,109 +614,107 @@ function NewsletterForm() {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       })
       if (res.ok) {
-        setStatus('✓ Thank you!')
+        setStatus('Inscription réussie.')
         setEmail('')
+      } else {
+        setStatus('Erreur, réessaie.')
       }
-    } catch (error) {
-      setStatus('Error. Try again.')
+    } catch {
+      setStatus('Erreur de connexion.')
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="newsletter-form">
-      <input 
-        type="email" 
-        placeholder="Enter your email"
+      <input
+        type="email"
+        className="newsletter-input"
+        placeholder="Votre email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
-        className="newsletter-input"
       />
-      <button type="submit" className="btn-primary">Subscribe</button>
-      {status && <p style={{width: '100%', marginTop: '0.5rem', fontSize: '0.9rem'}}>{status}</p>}
+      <button type="submit" className="newsletter-btn">
+        S’inscrire
+      </button>
+      {status && (
+        <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', opacity: 0.8 }}>{status}</p>
+      )}
     </form>
   )
 }
 
 function ChatAI({ onClose, user }) {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([
+    {
+      role: 'ai',
+      text:
+        user?.role === 'admin'
+          ? 'Salut, je suis ton IA de direction. Donne-moi des ordres (offres, fournisseurs, livraisons, etc.).'
+          : 'Bonjour, je peux t’aider pour les produits, commandes et conseils.',
+    },
+  ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (user?.role === 'admin') {
-      setMessages([{
-        role: 'ai',
-        text: 'Hello Boss. I'm your management AI. Give me orders and I'll execute them.'
-      }])
-    } else {
-      setMessages([{
-        role: 'ai',
-        text: 'Hi! I'm here to help. Ask me anything about our products or your orders.'
-      }])
-    }
-  }, [])
-
   const sendMessage = async () => {
     if (!input.trim()) return
-    
-    const userMessage = { role: 'user', text: input }
-    setMessages([...messages, userMessage])
-    const currentInput = input
+    const current = input
     setInput('')
+    setMessages((prev) => [...prev, { role: 'user', text: current }])
     setLoading(true)
 
     try {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: currentInput,
-          userRole: user?.role || 'guest'
-        })
+        body: JSON.stringify({
+          message: current,
+          userRole: user?.role || 'guest',
+        }),
       })
       const data = await res.json()
-      setMessages(prev => [...prev, { role: 'ai', text: data.response }])
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Connection error. Try again.' }])
+      setMessages((prev) => [...prev, { role: 'ai', text: data.response }])
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'ai', text: 'Impossible de répondre pour le moment.' },
+      ])
     }
     setLoading(false)
   }
 
   return (
     <div className="chat-overlay">
-      <div className="chat-container">
+      <div className="chat-box">
         <div className="chat-header">
-          <h3>{user?.role === 'admin' ? 'Management AI' : 'AI Assistant'}</h3>
-          <button onClick={onClose} className="close-btn">✕</button>
+          <span>{user?.role === 'admin' ? 'IA Direction' : 'Assistant IA'}</span>
+          <button className="chat-send" onClick={onClose}>
+            Fermer
+          </button>
         </div>
-        
-        <div className="chat-mode-badge">
-          {user?.role === 'admin' ? '🔧 ADMIN MODE' : '💬 SUPPORT MODE'}
-        </div>
-
         <div className="chat-messages">
-          {messages.map((msg, i) => (
-            <div key={i} className={msg.role === 'user' ? 'user-msg' : 'ai-msg'}>
-              {msg.text}
+          {messages.map((m, i) => (
+            <div key={i} className={m.role === 'ai' ? 'msg-ai' : 'msg-user'}>
+              {m.text}
             </div>
           ))}
-          {loading && <div className="ai-msg">Thinking...</div>}
+          {loading && <div className="msg-ai">L’IA réfléchit…</div>}
         </div>
-
-        <div className="chat-input-container">
-          <input 
-            type="text"
+        <div className="chat-input-row">
+          <input
+            className="chat-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="Type a message..."
-            className="chat-input"
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Écris ton message…"
           />
-          <button onClick={sendMessage} className="chat-send">Send</button>
+          <button className="chat-send" onClick={sendMessage}>
+            Envoyer
+          </button>
         </div>
       </div>
     </div>
