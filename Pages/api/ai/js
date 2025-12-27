@@ -1,0 +1,38 @@
+import axios from 'axios';
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Méthode non autorisée' });
+  }
+
+  const { question } = req.body;
+
+  if (!question || !question.trim()) {
+    return res.status(400).json({ error: 'Question vide' });
+  }
+
+  try {
+    const r = await axios.post(
+      process.env.PERPLEXITY_API_URL,
+      {
+        model: 'sonar-small-online',
+        messages: [{ role: 'user', content: question }]
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    const answer =
+      r.data?.choices?.[0]?.message?.content ||
+      'Pas de réponse retournée par l’IA.';
+
+    return res.status(200).json({ answer });
+  } catch (e) {
+    console.error(e.response?.data || e.message);
+    return res.status(500).json({ error: 'Erreur appel IA' });
+  }
+}
