@@ -1,40 +1,42 @@
+// pages/api/ai/chat.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { message } = req.body
+  const { message, userRole } = req.body
+
+  const systemPrompt =
+    userRole === 'admin'
+      ? `Tu es l'IA de direction d'Empire Électronique Mondial.
+Tu aides à gérer le site, les offres, les catégories, les prix, les fournisseurs et la logistique.
+Tu réponds avec des actions claires et des recommandations précises.`
+      : `Tu es le support client d'Empire Électronique Mondial.
+Tu aides les clients pour les produits (mobiles, tablettes, PC, accessoires, pièces détachées),
+le suivi de commande, le SAV et les conseils d'achat. Réponds simplement et poliment.`
 
   try {
-    // Appel à l'IA (OpenAI ou autre)
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+        Authorization: `Bearer ${process.env.PPLX_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'sonar-reasoning-pro',
         messages: [
-          {
-            role: 'system',
-            content: 'Tu es un assistant IA pour Empire Électronique Mondial. Tu peux : 1) Aider à trouver des produits 2) Gérer les commandes 3) Trouver les meilleurs fournisseurs 4) Optimiser les livraisons. Réponds de manière concise et professionnelle.'
-          },
-          {
-            role: 'user',
-            content: message
-          }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
         ],
-        max_tokens: 300
-      })
+        max_tokens: 600,
+      }),
     })
 
     const data = await response.json()
-    const aiResponse = data.choices[0].message.content
-
-    res.status(200).json({ response: aiResponse })
+    const reply = data?.choices?.[0]?.message?.content || 'Je ne peux pas répondre pour le moment.'
+    res.status(200).json({ response: reply })
   } catch (error) {
-    console.error('Erreur IA:', error)
-    res.status(500).json({ response: '❌ Désolé, une erreur est survenue. Réessayez.' })
+    console.error('IA error:', error)
+    res.status(500).json({ response: 'Erreur IA, réessaie plus tard.' })
   }
 }
