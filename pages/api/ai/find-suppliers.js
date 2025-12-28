@@ -1,41 +1,32 @@
-export default async function handler(req, res) {
-  const { product, quantity } = req.body
+// pages/api/ai/find-suppliers.js
+import { findSuppliersByProduct } from '../../../lib/suppliers-db'
+import { aiAgent } from '../../../lib/ai-agent'
 
-  // Liste de fournisseurs (tu peux intégrer ta liste partagée ici)
-  const suppliers = [
-    { name: 'AliExpress', website: 'aliexpress.com', specialty: 'Électronique', avgPrice: 'Bas' },
-    { name: 'Alibaba', website: 'alibaba.com', specialty: 'Gros volumes', avgPrice: 'Très bas' },
-    { name: 'Banggood', website: 'banggood.com', specialty: 'Électronique', avgPrice: 'Moyen' },
-    { name: 'DHgate', website: 'dhgate.com', specialty: 'Dropshipping', avgPrice: 'Bas' },
-    // Ajoute tes fournisseurs personnalisés ici
-  ]
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const { product, quantity, maxPrice } = req.body
 
   try {
-    // L'IA analyse et recommande les meilleurs fournisseurs
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [{
-          role: 'user',
-          content: `Analyse ces fournisseurs ${JSON.stringify(suppliers)} et recommande les 3 meilleurs pour acheter "${product}" en quantité ${quantity}. Donne le prix estimé et le délai de livraison.`
-        }],
-        max_tokens: 400
-      })
+    // 1. Cherche dans ta base fournisseurs
+    const suppliers = findSuppliersByProduct(product)
+
+    // 2. L'IA analyse et recommande
+    const aiRecommendation = await aiAgent({
+      task: `Je cherche ${quantity} unités de "${product}" à max ${maxPrice}€/unité. 
+      Voici les fournisseurs disponibles: ${JSON.stringify(suppliers)}.
+      Recommande les 3 meilleurs et rédige un email de demande de devis pour chacun.`,
+      context: { product, quantity, maxPrice, suppliers },
     })
 
-    const data = await response.json()
-    const recommendation = data.choices[0].message.content
-
-    res.status(200).json({ 
+    res.status(200).json({
       suppliers: suppliers,
-      aiRecommendation: recommendation
+      aiRecommendation: aiRecommendation,
     })
   } catch (error) {
-    res.status(500).json({ error: 'Erreur lors de la recherche de fournisseurs' })
+    console.error(error)
+    res.status(500).json({ error: 'Erreur recherche fournisseurs' })
   }
 }
