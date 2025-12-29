@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
-export default function Login() {
+export default function Register() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -12,10 +12,16 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+
+    if (password.length < 6) {
+      setError('Le mot de passe doit contenir au moins 6 caractères')
+      return
+    }
+
     setLoading(true)
 
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -25,12 +31,12 @@ export default function Login() {
 
       if (res.ok) {
         localStorage.setItem('user', JSON.stringify(data.user))
-        router.push(data.user.role === 'admin' ? '/admin/dashboard' : '/')
+        router.push('/')
       } else {
-        setError(data.error || 'Identifiants incorrects')
+        setError(data.error || 'Erreur inscription')
       }
     } catch (err) {
-      setError('Erreur de connexion')
+      setError('Erreur serveur')
     }
 
     setLoading(false)
@@ -39,7 +45,7 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>Connexion — Empire-Electronique</title>
+        <title>Inscription — Empire-Electronique</title>
       </Head>
 
       <div
@@ -75,7 +81,7 @@ export default function Login() {
             Empire-Electronique
           </h1>
           <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px', color: '#f5f5f5' }}>
-            Connexion
+            Inscription
           </h2>
 
           {error && (
@@ -146,14 +152,14 @@ export default function Login() {
                 opacity: loading ? 0.7 : 1,
               }}
             >
-              {loading ? 'Connexion...' : 'Se connecter'}
+              {loading ? 'Création...' : 'Créer mon compte'}
             </button>
           </form>
 
           <p style={{ marginTop: '24px', textAlign: 'center', color: '#a1a1aa' }}>
-            Pas de compte ?{' '}
-            <a href="/register" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>
-              S'inscrire
+            Déjà inscrit ?{' '}
+            <a href="/login" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>
+              Se connecter
             </a>
           </p>
         </div>
