@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
-export default function Register() {
+export default function Login() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -12,16 +12,10 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-
-    if (password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères')
-      return
-    }
-
     setLoading(true)
 
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -31,12 +25,12 @@ export default function Register() {
 
       if (res.ok) {
         localStorage.setItem('user', JSON.stringify(data.user))
-        router.push('/')
+        router.push(data.user.role === 'admin' ? '/admin/dashboard' : '/')
       } else {
-        setError(data.error || 'Erreur inscription')
+        setError(data.error || 'Identifiants incorrects')
       }
     } catch (err) {
-      setError('Erreur serveur')
+      setError('Erreur de connexion')
     }
 
     setLoading(false)
@@ -45,7 +39,7 @@ export default function Register() {
   return (
     <>
       <Head>
-        <title>Inscription — Empire-Electronique</title>
+        <title>Connexion — Empire-Electronique</title>
       </Head>
 
       <div
@@ -80,8 +74,8 @@ export default function Register() {
           >
             Empire-Electronique
           </h1>
-          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px' }}>
-            Inscription
+          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px', color: '#f5f5f5' }}>
+            Connexion
           </h2>
 
           {error && (
@@ -143,7 +137,7 @@ export default function Register() {
                 width: '100%',
                 padding: '14px',
                 background: '#22c55e',
-                color: '#020617',
+                color: '#0f172a',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '16px',
@@ -152,14 +146,14 @@ export default function Register() {
                 opacity: loading ? 0.7 : 1,
               }}
             >
-              {loading ? 'Création...' : 'Créer mon compte'}
+              {loading ? 'Connexion...' : 'Se connecter'}
             </button>
           </form>
 
           <p style={{ marginTop: '24px', textAlign: 'center', color: '#a1a1aa' }}>
-            Déjà inscrit ?{' '}
-            <a href="/login" style={{ color: '#22c55e', textDecoration: 'none' }}>
-              Se connecter
+            Pas de compte ?{' '}
+            <a href="/register" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>
+              S'inscrire
             </a>
           </p>
         </div>
