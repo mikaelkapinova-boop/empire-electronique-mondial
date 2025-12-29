@@ -1,14 +1,12 @@
 // pages/api/products.js
 import { products } from '../../lib/db'
 
-export default async function handler(req, res) {
+export default function handler(req, res) {
   if (req.method === 'GET') {
-    // Récupère tous les produits
     return res.status(200).json({ products })
   }
 
   if (req.method === 'POST') {
-    // Ajoute un produit (admin uniquement)
     const { name, category, condition, price, stock } = req.body
 
     if (!name || !category || !condition || !price) {
