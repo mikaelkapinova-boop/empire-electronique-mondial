@@ -1,4 +1,3 @@
-// pages/index.js
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
@@ -51,7 +50,6 @@ export default function Home() {
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#050816', color: '#f5f5f5' }}>
-        {/* Header fin et moderne */}
         <header
           style={{
             position: 'sticky',
@@ -81,12 +79,13 @@ export default function Home() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 margin: 0,
+                cursor: 'pointer',
               }}
+              onClick={() => router.push('/')}
             >
               Empire-Electronique
             </h1>
 
-            {/* Menu burger amélioré */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               style={{
@@ -126,13 +125,11 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Menu déroulant */}
           {menuOpen && (
             <nav
               style={{
                 background: '#0f172a',
                 borderTop: '1px solid #1e293b',
-                animation: 'slideDown 0.3s ease',
               }}
             >
               <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 24px' }}>
@@ -214,7 +211,6 @@ export default function Home() {
           )}
         </header>
 
-        {/* Hero section */}
         <section
           style={{
             padding: '60px 24px',
@@ -254,7 +250,6 @@ export default function Home() {
           </button>
         </section>
 
-        {/* Offres principales */}
         <section style={{ padding: '60px 24px', maxWidth: '1200px', margin: '0 auto' }}>
           <div
             style={{
@@ -310,59 +305,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Newsletter */}
-        <section
-          style={{
-            padding: '60px 24px',
-            background: '#0f172a',
-            borderTop: '1px solid #1e293b',
-            textAlign: 'center',
-          }}
-        >
-          <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '16px' }}>
-            Restez informé
-          </h3>
-          <p style={{ color: '#a1a1aa', marginBottom: '24px' }}>
-            Recevez les nouvelles offres, restocks et promos exclusives
-          </p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              alert('Inscription réussie !')
-            }}
-            style={{ maxWidth: '400px', margin: '0 auto', display: 'flex', gap: '8px' }}
-          >
-            <input
-              type="email"
-              placeholder="votre@email.com"
-              required
-              style={{
-                flex: 1,
-                padding: '12px',
-                borderRadius: '8px',
-                border: '1px solid #1e293b',
-                background: '#020617',
-                color: '#f5f5f5',
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                background: '#22c55e',
-                color: '#0f172a',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                fontWeight: '600',
-                cursor: 'pointer',
-              }}
-            >
-              S'inscrire
-            </button>
-          </form>
-        </section>
-
-        {/* Bulle de chat client uniquement */}
         {showChat && (
           <div
             style={{
@@ -425,7 +367,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Bouton bulle de chat */}
         <button
           onClick={() => setShowChat(!showChat)}
           style={{
@@ -459,19 +400,6 @@ export default function Home() {
           © 2025 Empire-Electronique — Tous droits réservés
         </footer>
       </div>
-
-      <style jsx global>{\`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      \`}</style>
     </>
   )
 }
