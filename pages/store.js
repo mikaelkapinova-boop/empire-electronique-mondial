@@ -3,270 +3,205 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 
-const ALL_PRODUCTS = [
-  {
-    id: 1,
-    name: 'iPhone 13 écran reconditionné',
-    category: 'smartphone',
-    condition: 'refurbished',
-    type: 'pièce',
-    price: 129,
-  },
-  {
-    id: 2,
-    name: 'Samsung Galaxy S22 neuf',
-    category: 'smartphone',
-    condition: 'new',
-    type: 'appareil',
-    price: 799,
-  },
-  {
-    id: 3,
-    name: 'Chargeur USB-C 30W universel',
-    category: 'accessoire',
-    condition: 'new',
-    type: 'accessoire',
-    price: 29,
-  },
-  {
-    id: 4,
-    name: 'PC Portable i7 reconditionné',
-    category: 'ordinateur',
-    condition: 'refurbished',
-    type: 'appareil',
-    price: 699,
-  },
-  {
-    id: 5,
-    name: 'Coque silicone iPhone 14',
-    category: 'accessoire',
-    condition: 'new',
-    type: 'accessoire',
-    price: 19,
-  },
-]
-
 export default function Store() {
   const router = useRouter()
   const [search, setSearch] = useState('')
-  const [condition, setCondition] = useState('all') // all | new | refurbished
-  const [deviceType, setDeviceType] = useState('all') // all | smartphone | tablette | ordinateur | accessoire
-  const [filtered, setFiltered] = useState(ALL_PRODUCTS)
+  const [condition, setCondition] = useState('all')
+  const [deviceType, setDeviceType] = useState('all')
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    filterProducts()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, condition, deviceType])
+    // Récupération des produits depuis l'API
+    fetchProducts()
+  }, [])
 
-  const filterProducts = () => {
-    let list = [...ALL_PRODUCTS]
-
-    if (search.trim()) {
-      const s = search.toLowerCase()
-      list = list.filter((p) => p.name.toLowerCase().includes(s))
+  const fetchProducts = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/products')
+      const data = await res.json()
+      setProducts(data.products || [])
+    } catch (error) {
+      console.error('Erreur chargement produits:', error)
+      setProducts([])
     }
-
-    if (condition !== 'all') {
-      list = list.filter((p) => p.condition === condition)
-    }
-
-    if (deviceType !== 'all') {
-      list = list.filter((p) => p.category === deviceType)
-    }
-
-    setFiltered(list)
+    setLoading(false)
   }
+
+  const filtered = products.filter((p) => {
+    if (search.trim() && !p.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (condition !== 'all' && p.condition !== condition) return false
+    if (deviceType !== 'all' && p.category !== deviceType) return false
+    return true
+  })
 
   return (
     <>
       <Head>
-        <title>Store — Empire Électronique</title>
-        <meta
-          name="description"
-          content="Recherchez des mobiles, tablettes, PC, accessoires et pièces détachées, neufs ou reconditionnés."
-        />
+        <title>Boutique — Empire-Electronique</title>
+        <meta name="description" content="Recherche d'appareils et pièces détachées" />
       </Head>
 
-      <style jsx>{`
-        .page {
-          min-height: 100vh;
-          background: #000;
-          color: #f5f5f7;
-          padding: 80px 20px 40px;
-        }
+      <div style={{ minHeight: '100vh', background: '#050816', color: '#f5f5f5' }}>
+        {/* Header */}
+        <header
+          style={{
+            background: '#0f172a',
+            borderBottom: '1px solid #1e293b',
+            padding: '16px 24px',
+          }}
+        >
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <h1
+              onClick={() => router.push('/')}
+              style={{
+                fontSize: '20px',
+                fontWeight: '700',
+                background: 'linear-gradient(to right, #22c55e, #10b981)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                margin: 0,
+                cursor: 'pointer',
+              }}
+            >
+              Empire-Electronique
+            </h1>
+          </div>
+        </header>
 
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .title {
-          font-size: 2rem;
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-          font-size: 0.95rem;
-          opacity: 0.7;
-          margin-bottom: 1.5rem;
-        }
-
-        .filters {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.75rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .search {
-          flex: 1;
-          min-width: 220px;
-          padding: 10px 14px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.25);
-          background: transparent;
-          color: #f5f5f7;
-          font-size: 0.9rem;
-        }
-
-        .pill {
-          padding: 8px 14px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.25);
-          background: transparent;
-          color: #f5f5f7;
-          font-size: 0.85rem;
-          cursor: pointer;
-        }
-
-        .pill.active {
-          background: #f5f5f7;
-          color: #000;
-        }
-
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-          gap: 1rem;
-          margin-top: 1rem;
-        }
-
-        .card {
-          background: linear-gradient(135deg, #111 0, #050505 100%);
-          border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          padding: 16px 18px;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-        }
-
-        .name {
-          font-size: 0.95rem;
-          font-weight: 500;
-        }
-
-        .meta {
-          font-size: 0.8rem;
-          opacity: 0.7;
-        }
-
-        .price {
-          margin-top: 0.25rem;
-          font-weight: 600;
-        }
-
-        .cta {
-          margin-top: 0.5rem;
-          align-self: flex-start;
-          padding: 8px 14px;
-          border-radius: 999px;
-          border: none;
-          background: #f5f5f7;
-          color: #000;
-          font-size: 0.85rem;
-          cursor: pointer;
-        }
-      `}</style>
-
-      <main className="page">
-        <div className="container">
-          <h1 className="title">Store</h1>
-          <p className="subtitle">
-            Recherche d’appareils et pièces détachées (toutes marques) — neuf ou reconditionné.
+        {/* Contenu */}
+        <main style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '12px' }}>
+            🛒 Store
+          </h2>
+          <p style={{ color: '#a1a1aa', marginBottom: '32px' }}>
+            Recherche d'appareils et pièces détachées (toutes marques) — neuf ou reconditionné.
           </p>
 
-          <div className="filters">
+          {/* Filtres */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '16px',
+              marginBottom: '32px',
+            }}
+          >
             <input
-              className="search"
-              placeholder="Rechercher un modèle, une pièce, une référence..."
+              type="text"
+              placeholder="🔍 Rechercher un produit..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              style={{
+                padding: '12px',
+                borderRadius: '8px',
+                border: '1px solid #1e293b',
+                background: '#020617',
+                color: '#f5f5f5',
+              }}
             />
-
-            <button
-              className={`pill ${condition === 'all' ? 'active' : ''}`}
-              onClick={() => setCondition('all')}
+            <select
+              value={condition}
+              onChange={(e) => setCondition(e.target.value)}
+              style={{
+                padding: '12px',
+                borderRadius: '8px',
+                border: '1px solid #1e293b',
+                background: '#020617',
+                color: '#f5f5f5',
+              }}
             >
-              Tout
-            </button>
-            <button
-              className={`pill ${condition === 'new' ? 'active' : ''}`}
-              onClick={() => setCondition('new')}
+              <option value="all">Toutes conditions</option>
+              <option value="new">Neuf</option>
+              <option value="refurbished">Reconditionné</option>
+            </select>
+            <select
+              value={deviceType}
+              onChange={(e) => setDeviceType(e.target.value)}
+              style={{
+                padding: '12px',
+                borderRadius: '8px',
+                border: '1px solid #1e293b',
+                background: '#020617',
+                color: '#f5f5f5',
+              }}
             >
-              Neuf
-            </button>
-            <button
-              className={`pill ${condition === 'refurbished' ? 'active' : ''}`}
-              onClick={() => setCondition('refurbished')}
-            >
-              Reconditionné
-            </button>
-
-            <button
-              className={`pill ${deviceType === 'all' ? 'active' : ''}`}
-              onClick={() => setDeviceType('all')}
-            >
-              Tout type
-            </button>
-            <button
-              className={`pill ${deviceType === 'smartphone' ? 'active' : ''}`}
-              onClick={() => setDeviceType('smartphone')}
-            >
-              Téléphones
-            </button>
-            <button
-              className={`pill ${deviceType === 'ordinateur' ? 'active' : ''}`}
-              onClick={() => setDeviceType('ordinateur')}
-            >
-              PC / Ordi
-            </button>
-            <button
-              className={`pill ${deviceType === 'accessoire' ? 'active' : ''}`}
-              onClick={() => setDeviceType('accessoire')}
-            >
-              Accessoires
-            </button>
+              <option value="all">Tous les types</option>
+              <option value="smartphone">Smartphones</option>
+              <option value="tablette">Tablettes</option>
+              <option value="ordinateur">Ordinateurs</option>
+              <option value="accessoire">Accessoires</option>
+            </select>
           </div>
 
-          <div className="grid">
-            {filtered.map((p) => (
-              <article key={p.id} className="card">
-                <div className="name">{p.name}</div>
-                <div className="meta">
-                  {p.category} • {p.type} •
-                  {p.condition === 'new' ? ' neuf' : ' reconditionné'}
+          {/* Produits */}
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '60px 0' }}>
+              <p style={{ color: '#a1a1aa', fontSize: '18px' }}>Chargement des produits...</p>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '60px 24px',
+                background: '#020617',
+                borderRadius: '16px',
+                border: '1px solid #1e293b',
+              }}
+            >
+              <p style={{ fontSize: '48px', marginBottom: '16px' }}>📦</p>
+              <h3 style={{ fontSize: '24px', marginBottom: '8px' }}>Aucun produit disponible</h3>
+              <p style={{ color: '#a1a1aa' }}>
+                {search ? 'Aucun produit ne correspond à ta recherche.' : 'Le catalogue est en cours de construction.'}
+              </p>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '24px',
+              }}
+            >
+              {filtered.map((product) => (
+                <div
+                  key={product.id}
+                  style={{
+                    background: '#020617',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    border: '1px solid #1e293b',
+                    transition: 'transform 0.2s ease',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>
+                    {product.name}
+                  </h3>
+                  <p style={{ color: '#22c55e', fontSize: '20px', fontWeight: '700', margin: '12px 0' }}>
+                    {product.price}€
+                  </p>
+                  <button
+                    style={{
+                      width: '100%',
+                      background: '#22c55e',
+                      color: '#020617',
+                      border: 'none',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Ajouter au panier
+                  </button>
                 </div>
-                <div className="price">{p.price} €</div>
-                <button className="cta">Voir le produit</button>
-              </article>
-            ))}
-
-            {filtered.length === 0 && <p>Aucun produit ne correspond à ta recherche.</p>}
-          </div>
-        </div>
-      </main>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
     </>
   )
 }
