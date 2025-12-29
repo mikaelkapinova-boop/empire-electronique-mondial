@@ -1,3 +1,4 @@
+// pages/login.js
 import Head from 'next/head'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
@@ -6,93 +7,158 @@ export default function Login() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Simule un login admin si email spécial
-    const role = email === 'admin@empire.com' ? 'admin' : 'customer'
-    localStorage.setItem('user', JSON.stringify({ email, role }))
-    router.push('/')
+    setError('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await res.json()
+
+      if (res.ok) {
+        localStorage.setItem('user', JSON.stringify(data.user))
+        router.push(data.user.role === 'admin' ? '/admin/dashboard' : '/')
+      } else {
+        setError(data.error || 'Identifiants incorrects')
+      }
+    } catch (err) {
+      setError('Erreur de connexion')
+    }
+
+    setLoading(false)
   }
 
   return (
     <>
       <Head>
-        <title>Connexion — Empire Électronique</title>
+        <title>Connexion — Empire-Electronique</title>
       </Head>
-      <main
+
+      <div
         style={{
           minHeight: '100vh',
+          background: '#050816',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#000',
-          color: '#f5f5f7',
-          padding: '20px',
+          padding: '24px',
         }}
       >
-        <form
-          onSubmit={handleSubmit}
+        <div
           style={{
             width: '100%',
-            maxWidth: 400,
-            background: '#050505',
-            padding: 24,
-            borderRadius: 18,
-            border: '1px solid rgba(255,255,255,0.1)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
+            maxWidth: '400px',
+            background: '#0f172a',
+            padding: '40px',
+            borderRadius: '16px',
+            border: '1px solid #1e293b',
           }}
         >
-          <h1 style={{ fontSize: '1.4rem', marginBottom: 8 }}>Connexion</h1>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+          <h1
             style={{
-              padding: '10px 14px',
-              borderRadius: 999,
-              border: '1px solid rgba(255,255,255,0.25)',
-              background: 'transparent',
-              color: '#f5f5f7',
-            }}
-          />
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              padding: '10px 14px',
-              borderRadius: 999,
-              border: '1px solid rgba(255,255,255,0.25)',
-              background: 'transparent',
-              color: '#f5f5f7',
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              marginTop: 8,
-              padding: '10px 16px',
-              borderRadius: 999,
-              border: 'none',
-              background: '#f5f5f7',
-              color: '#000',
-              cursor: 'pointer',
+              fontSize: '24px',
+              fontWeight: '700',
+              marginBottom: '8px',
+              background: 'linear-gradient(to right, #22c55e, #10b981)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
             }}
           >
-            Se connecter
-          </button>
-          <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-            Admin de test : <strong>admin@empire.com</strong> (n’importe quel mot de passe).
+            Empire-Electronique
+          </h1>
+          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px', color: '#f5f5f5' }}>
+            Connexion
+          </h2>
+
+          {error && (
+            <div
+              style={{
+                padding: '12px',
+                background: '#7f1d1d',
+                border: '1px solid #991b1b',
+                borderRadius: '8px',
+                marginBottom: '16px',
+                color: '#fca5a5',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: '#a1a1aa' }}>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid #1e293b',
+                  background: '#020617',
+                  color: '#f5f5f5',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', color: '#a1a1aa' }}>Mot de passe</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid #1e293b',
+                  background: '#020617',
+                  color: '#f5f5f5',
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px',
+                background: '#22c55e',
+                color: '#020617',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: loading ? 'wait' : 'pointer',
+                opacity: loading ? 0.7 : 1,
+              }}
+            >
+              {loading ? 'Connexion...' : 'Se connecter'}
+            </button>
+          </form>
+
+          <p style={{ marginTop: '24px', textAlign: 'center', color: '#a1a1aa' }}>
+            Pas encore de compte ?{' '}
+            <a href="/register" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>
+              S'inscrire
+            </a>
           </p>
-        </form>
-      </main>
+        </div>
+      </div>
     </>
   )
 }
