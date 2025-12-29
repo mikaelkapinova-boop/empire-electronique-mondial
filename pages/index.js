@@ -110,7 +110,8 @@ export default function Home() {
                   height: '2px',
                   background: '#22c55e',
                   transition: 'all 0.3s ease',
-                  transform: menuOpen ? 'rotate(45deg) translateY(7px)' : 'none',
+                  position: 'absolute',
+                  transform: menuOpen ? 'rotate(45deg)' : 'rotate(0deg)',
                 }}
               />
               <span
@@ -119,7 +120,8 @@ export default function Home() {
                   height: '2px',
                   background: '#22c55e',
                   transition: 'all 0.3s ease',
-                  transform: menuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none',
+                  position: 'absolute',
+                  transform: menuOpen ? 'rotate(-45deg)' : 'rotate(0deg)',
                 }}
               />
             </button>
