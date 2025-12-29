@@ -177,7 +177,7 @@ export default function Store() {
                     style={{
                       width: '100%',
                       background: '#22c55e',
-                      color: '#020617',
+                      color: '#0f172a',
                       border: 'none',
                       padding: '10px',
                       borderRadius: '8px',
