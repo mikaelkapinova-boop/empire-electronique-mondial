@@ -1,4 +1,3 @@
-// pages/store.js
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
@@ -12,7 +11,6 @@ export default function Store() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Récupération des produits depuis l'API
     fetchProducts()
   }, [])
 
@@ -23,7 +21,7 @@ export default function Store() {
       const data = await res.json()
       setProducts(data.products || [])
     } catch (error) {
-      console.error('Erreur chargement produits:', error)
+      console.error('Erreur:', error)
       setProducts([])
     }
     setLoading(false)
@@ -40,11 +38,9 @@ export default function Store() {
     <>
       <Head>
         <title>Boutique — Empire-Electronique</title>
-        <meta name="description" content="Recherche d'appareils et pièces détachées" />
       </Head>
 
       <div style={{ minHeight: '100vh', background: '#050816', color: '#f5f5f5' }}>
-        {/* Header */}
         <header
           style={{
             background: '#0f172a',
@@ -70,16 +66,14 @@ export default function Store() {
           </div>
         </header>
 
-        {/* Contenu */}
         <main style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '12px' }}>
             🛒 Store
           </h2>
           <p style={{ color: '#a1a1aa', marginBottom: '32px' }}>
-            Recherche d'appareils et pièces détachées (toutes marques) — neuf ou reconditionné.
+            Recherche d'appareils et pièces détachées
           </p>
 
-          {/* Filtres */}
           <div
             style={{
               display: 'grid',
@@ -90,7 +84,7 @@ export default function Store() {
           >
             <input
               type="text"
-              placeholder="🔍 Rechercher un produit..."
+              placeholder="🔍 Rechercher..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
@@ -135,10 +129,9 @@ export default function Store() {
             </select>
           </div>
 
-          {/* Produits */}
           {loading ? (
             <div style={{ textAlign: 'center', padding: '60px 0' }}>
-              <p style={{ color: '#a1a1aa', fontSize: '18px' }}>Chargement des produits...</p>
+              <p style={{ color: '#a1a1aa' }}>Chargement...</p>
             </div>
           ) : filtered.length === 0 ? (
             <div
@@ -151,9 +144,9 @@ export default function Store() {
               }}
             >
               <p style={{ fontSize: '48px', marginBottom: '16px' }}>📦</p>
-              <h3 style={{ fontSize: '24px', marginBottom: '8px' }}>Aucun produit disponible</h3>
+              <h3 style={{ fontSize: '24px', marginBottom: '8px' }}>Aucun produit</h3>
               <p style={{ color: '#a1a1aa' }}>
-                {search ? 'Aucun produit ne correspond à ta recherche.' : 'Le catalogue est en cours de construction.'}
+                Le catalogue est en cours de construction.
               </p>
             </div>
           ) : (
@@ -172,14 +165,12 @@ export default function Store() {
                     borderRadius: '12px',
                     padding: '20px',
                     border: '1px solid #1e293b',
-                    transition: 'transform 0.2s ease',
-                    cursor: 'pointer',
                   }}
                 >
-                  <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '18px', marginBottom: '8px' }}>
                     {product.name}
                   </h3>
-                  <p style={{ color: '#22c55e', fontSize: '20px', fontWeight: '700', margin: '12px 0' }}>
+                  <p style={{ color: '#22c55e', fontSize: '20px', fontWeight: '700' }}>
                     {product.price}€
                   </p>
                   <button
@@ -192,6 +183,7 @@ export default function Store() {
                       borderRadius: '8px',
                       fontWeight: '600',
                       cursor: 'pointer',
+                      marginTop: '12px',
                     }}
                   >
                     Ajouter au panier
