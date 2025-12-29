@@ -21,7 +21,7 @@ export default function Home() {
   const offers = [
     {
       title: 'Offre iPhone du moment',
-      subtitle: 'Économisez jusqu\'à 30% sur une sélection de smartphones.',
+      subtitle: 'Économisez jusquà 30% sur une sélection de smartphones.',
       tag: 'Smartphones',
       cta: 'Voir les offres iPhone',
       href: '/store?category=smartphones',
@@ -35,7 +35,7 @@ export default function Home() {
     },
     {
       title: 'Reconditionné Premium',
-      subtitle: 'Garantie, contrôlé, prêt à l\'emploi. Meilleur prix, même qualité.',
+      subtitle: 'Garantie, contrôlé, prêt à lemploi. Meilleur prix, même qualité.',
       tag: 'Reconditionné',
       cta: 'Voir le reconditionné',
       href: '/store?condition=refurbished',
