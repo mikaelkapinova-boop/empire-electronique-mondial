@@ -74,7 +74,7 @@ export default function Login() {
           >
             Empire-Electronique
           </h1>
-          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px', color: '#f5f5f5' }}>
             Connexion
           </h2>
 
@@ -137,7 +137,7 @@ export default function Login() {
                 width: '100%',
                 padding: '14px',
                 background: '#22c55e',
-                color: '#020617',
+                color: '#0f172a',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '16px',
@@ -152,7 +152,7 @@ export default function Login() {
 
           <p style={{ marginTop: '24px', textAlign: 'center', color: '#a1a1aa' }}>
             Pas de compte ?{' '}
-            <a href="/register" style={{ color: '#22c55e', textDecoration: 'none' }}>
+            <a href="/register" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>
               S'inscrire
             </a>
           </p>
@@ -161,4 +161,3 @@ export default function Login() {
     </>
   )
 }
-
