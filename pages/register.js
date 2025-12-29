@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { supabase } from '../../lib/supabaseClient'
 
 export default function Register() {
   const router = useRouter()
@@ -20,23 +21,28 @@ export default function Register() {
 
     setLoading(true)
 
-    try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
 
-      const data = await res.json()
+    if (error) {
+      setError(error.message)
+    } else {
+      // Créer profil utilisateur
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: data.user.id,
+          email,
+          role: 'customer'
+        })
 
-      if (res.ok) {
-        localStorage.setItem('user', JSON.stringify(data.user))
-        router.push('/')
+      if (profileError) {
+        setError('Erreur création profil')
       } else {
-        setError(data.error || 'Erreur inscription')
+        router.push('/login?message=Inscription réussie, connectez-vous')
       }
-    } catch (err) {
-      setError('Erreur serveur')
     }
 
     setLoading(false)
@@ -48,53 +54,15 @@ export default function Register() {
         <title>Inscription — Empire-Electronique</title>
       </Head>
 
-      <div
-        style={{
-          minHeight: '100vh',
-          background: '#050816',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '24px',
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '400px',
-            background: '#0f172a',
-            padding: '40px',
-            borderRadius: '16px',
-            border: '1px solid #1e293b',
-          }}
-        >
-          <h1
-            style={{
-              fontSize: '24px',
-              fontWeight: '700',
-              marginBottom: '8px',
-              background: 'linear-gradient(to right, #22c55e, #10b981)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
+      <div style={{ minHeight: '100vh', background: '#050816', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ width: '100%', maxWidth: '400px', background: '#0f172a', padding: '40px', borderRadius: '16px', border: '1px solid #1e293b' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '8px', background: 'linear-gradient(to right, #22c55e, #10b981)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Empire-Electronique
           </h1>
-          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px', color: '#f5f5f5' }}>
-            Inscription
-          </h2>
+          <h2 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '24px', color: '#f5f5f5' }}>Inscription</h2>
 
           {error && (
-            <div
-              style={{
-                padding: '12px',
-                background: '#7f1d1d',
-                border: '1px solid #991b1b',
-                borderRadius: '8px',
-                marginBottom: '16px',
-                color: '#fca5a5',
-              }}
-            >
+            <div style={{ padding: '12px', background: '#7f1d1d', border: '1px solid #991b1b', borderRadius: '8px', marginBottom: '16px', color: '#fca5a5' }}>
               {error}
             </div>
           )}
@@ -107,17 +75,9 @@ export default function Register() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid #1e293b',
-                  background: '#020617',
-                  color: '#f5f5f5',
-                }}
+                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #1e293b', background: '#020617', color: '#f5f5f5' }}
               />
             </div>
-
             <div style={{ marginBottom: '24px' }}>
               <label style={{ display: 'block', marginBottom: '8px', color: '#a1a1aa' }}>Mot de passe</label>
               <input
@@ -125,42 +85,19 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid #1e293b',
-                  background: '#020617',
-                  color: '#f5f5f5',
-                }}
+                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #1e293b', background: '#020617', color: '#f5f5f5' }}
               />
             </div>
-
             <button
               type="submit"
               disabled={loading}
-              style={{
-                width: '100%',
-                padding: '14px',
-                background: '#22c55e',
-                color: '#0f172a',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: loading ? 'wait' : 'pointer',
-                opacity: loading ? 0.7 : 1,
-              }}
+              style={{ width: '100%', padding: '14px', background: '#22c55e', color: '#0f172a', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: '600', cursor: loading ? 'wait' : 'pointer', opacity: loading ? 0.7 : 1 }}
             >
               {loading ? 'Création...' : 'Créer mon compte'}
             </button>
           </form>
-
           <p style={{ marginTop: '24px', textAlign: 'center', color: '#a1a1aa' }}>
-            Déjà inscrit ?{' '}
-            <a href="/login" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>
-              Se connecter
-            </a>
+            Déjà inscrit ? <a href="/login" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: '600' }}>Se connecter</a>
           </p>
         </div>
       </div>
